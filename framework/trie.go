@@ -14,7 +14,7 @@ type Tree struct {
 // Represent the node of the tree
 type node struct {
 	isLeaf   bool              // Is the leaf node
-	segement string            // The uri string
+	segment  string            // The uri string
 	handler  ControllerHandler // The controller handler
 	children []*node           // The children of the node
 }
@@ -22,7 +22,7 @@ type node struct {
 func newNode() *node {
 	return &node{
 		isLeaf:   false,
-		segement: "",
+		segment:  "",
 		children: []*node{},
 	}
 }
@@ -54,10 +54,10 @@ func (n *node) filterChildNodes(segment string) []*node {
 	nodes := make([]*node, 0, len(n.children))
 	for _, child := range n.children {
 		// If the child's segment is a wild segment, append it
-		if isWildSegment(child.segement) {
+		if isWildSegment(child.segment) {
 			nodes = append(nodes, child)
 			//
-		} else if child.segement == segment {
+		} else if child.segment == segment {
 			nodes = append(nodes, child)
 		}
 	}
@@ -79,11 +79,11 @@ func (n *node) matchNode(uri string) *node {
 	// Find the children nodes by segment rules
 	children := n.filterChildNodes(segment)
 
-	if children == nil || len(children) == 0 {
+	if len(children) == 0 {
 		return nil
 	}
 
-	//
+	// If there is only one segment, return the first leaf node
 	if len(segments) == 1 {
 		for _, child := range children {
 			if child.isLeaf {
@@ -123,9 +123,9 @@ func (tree *Tree) AddRouter(uri string, handler ControllerHandler) error {
 
 		childrenNodes := n.filterChildNodes(segment)
 
-		if len(childrenNodes) == 0 {
+		if len(childrenNodes) > 0 {
 			for _, child := range childrenNodes {
-				if child.segement == segment {
+				if child.segment == segment {
 					objNode = child
 					break
 				}
@@ -134,7 +134,7 @@ func (tree *Tree) AddRouter(uri string, handler ControllerHandler) error {
 
 		if objNode == nil {
 			childNode := newNode()
-			childNode.segement = segment
+			childNode.segment = segment
 			if isLast {
 				childNode.isLeaf = true
 				childNode.handler = handler
@@ -147,4 +147,12 @@ func (tree *Tree) AddRouter(uri string, handler ControllerHandler) error {
 	}
 
 	return nil
+}
+
+func (tree *Tree) FindHandler(uri string) ControllerHandler {
+	matchNode := tree.root.matchNode(uri)
+	if matchNode == nil {
+		return nil
+	}
+	return matchNode.handler
 }
