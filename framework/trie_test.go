@@ -39,6 +39,13 @@ func Test_filterChildNodes(t *testing.T) {
 		}
 	}
 
+	{
+		nodes := root.filterChildNodes("BAR")
+		if len(nodes) != 1 {
+			t.Error("Bar error")
+		}
+	}
+
 }
 
 func Test_matchNode(t *testing.T) {
@@ -80,6 +87,13 @@ func Test_matchNode(t *testing.T) {
 		node := root.matchNode("test")
 		if node == nil {
 			t.Error("match test")
+		}
+	}
+
+	{
+		node := root.matchNode("foo/bar/test")
+		if node != nil {
+			t.Error("match foo/bar test")
 		}
 	}
 

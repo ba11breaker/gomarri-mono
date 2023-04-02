@@ -65,6 +65,7 @@ func (n *node) filterChildNodes(segment string) []*node {
 	return nodes
 }
 
+// Check if the uri already existed in the children nodes
 func (n *node) matchNode(uri string) *node {
 
 	segments := strings.SplitN(uri, "/", 2)
